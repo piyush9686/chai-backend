@@ -13,6 +13,14 @@ import connectDB from "./db/index.js";
 
 connectDB()
 
+//async mthod ek promise return krta h to usme .then .catch use kr skte h
+.then(()=>{
+    app.listen(process.env.PORT || 8000,()=>{
+        console.log(` App is listening on port ${process.env.PORT || 8000}`);
+    })
+})
+.catch((err)=>{console.error(" DB CONNECTION ERROR!!!",err)})
+
 
 
 
