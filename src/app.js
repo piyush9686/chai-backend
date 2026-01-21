@@ -24,6 +24,17 @@ app.use(cookieParser());
 
 
 
+//routes
+import userRouter from './routes/user.routes.js'
+
+//routes declaration by middlewares "use"
+app.use("/api/v1/users",userRouter)   //perfix
+
+
+//http://localhost:8000/api/v1/users/register
+
+
+
 
 
 export { app }
