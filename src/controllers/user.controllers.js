@@ -25,7 +25,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 
     const {fullname,email,username,password}=req.body
-    console.log("email",email);
+    //console.log("email",email);
 
     if(
        [fullname,email,username, password].some((field)=>   //some true return krdega
@@ -48,8 +48,16 @@ const registerUser=asyncHandler(async(req,res)=>{
 
  //step 4
  const avatarLocalPath= req.files?.avatar[0]?.path;
- const coverImageLocalPath= req.files?.coverImage[0]?.path;
- console.log("avatarLocalPath",avatarLocalPath);
+ //const coverImageLocalPath= req.files?.coverImage[0]?.path;
+
+ let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath= req.files.coverImage[0].path;
+    }
+
+
+ 
+ //console.log("avatarLocalPath",avatarLocalPath);
 
  if(!avatarLocalPath){ 
     throw new ApiErrror(400, "avatar files is required") 
@@ -57,8 +65,9 @@ const registerUser=asyncHandler(async(req,res)=>{
  
  //step 5
     const avatar= await uploadOnCloudinary(avatarLocalPath);
-    const coverImage= await uploadOnCloudinary(coverImageLocalPath);
+   const coverImage= await uploadOnCloudinary(coverImageLocalPath);
 
+    
     if(!avatar){     //avatar is required so we are checking its gone or not
         throw new ApiErrror(400, "avatar files is required")
     }

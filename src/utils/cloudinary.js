@@ -17,14 +17,19 @@ import fs from "fs";          // Import the file system module
     const uploadOnCloudinary = async (localFilePath)=>{
         try{
             if(!localFilePath) return null;
+
+            //wimdow path fix
+         //   const filePath= path.resolve(localFilePath);
+
             //uploading file to cloudinary
-        const respon =await cloudinary.uploader.upload
+        const response =await cloudinary.uploader.upload
         (localFilePath,
             { resource_type:"auto"})
             
 
             //file has been uploaded
-            console.log("file uploaded to cloudinary",response.url);
+            //console.log("file uploaded to cloudinary",response.url);
+            fs.unlinkSync(localFilePath); //deleting the file from local storage
             return response;
         
         }catch(error){

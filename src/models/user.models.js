@@ -62,10 +62,10 @@ const userSchema = new Schema(
 )
 //passs encrypp
 userSchema.pre("save", async function (next) {         //()=>{} callback function not use here because of 'this' keyword
-    if(!this.isModified('password')) return next();  //if password is not modified then skip hashing
+    if(!this.isModified("password")) return next();  //if password is not modified then skip hashing
      this.password=await bcrypt.hash(this.password,10);  //hash the password before saving
      next();
-})
+});
 
 userSchema.methods.isPasswordMatch=async function(plainPassword){
    return await bcrypt.compare(plainPassword,this.password);
@@ -89,7 +89,7 @@ userSchema.methods.generateRefreshToken=function(){
         _id: this._id,
     
     },
-    process.env.REFRESS_TOKEN_SECRET,
+    process.env.REFRESH_TOKEN_SECRET,
     {expiresIn: process.env.REFRESH_TOKEN_EXPIRES}
 )
 }
