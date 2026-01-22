@@ -1,6 +1,6 @@
 import mongoose,{Schema} from 'mongoose';
 
-import bcrypt from 'bcryptjs';     //use for password hashing
+import bcrypt from 'bcrypt';     //use for password hashing
 import jwt from 'jsonwebtoken';
 
 const userSchema = new Schema(

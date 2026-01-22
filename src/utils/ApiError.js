@@ -3,7 +3,7 @@ class ApiErrror extends Error {
         statuscode,
         message="something went wrong",
         errors=[],
-        statck=""
+        stack=""
     ){                         //constructor override
         super(message);  //Error class ka constructor call krdenge
         this.statuscode=statuscode;

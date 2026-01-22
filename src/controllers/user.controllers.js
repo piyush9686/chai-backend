@@ -2,11 +2,15 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 import {ApiErrror} from "../utils/ApiError.js"
 
-import {User} from "../models/user.model.js"
+import {User} from "../models/user.models.js"
 
 import{uploadOnCloudinary} from "../utils/cloudinary.js"
 
 import {ApiResponse} from "../utils/ApiResponse.js";
+
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+
 
 const registerUser=asyncHandler(async(req,res)=>{
     //get user detais from frontend
@@ -24,7 +28,7 @@ const registerUser=asyncHandler(async(req,res)=>{
     console.log("email",email);
 
     if(
-       [fulname,email,username, password].some((field)=>   //some true return krdega
+       [fullname,email,username, password].some((field)=>   //some true return krdega
         field?.trim() ==="")
       
      ) {
@@ -33,7 +37,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 
  
- const existedUser= User.findOne({          //step 3 
+ const existedUser=  await User.findOne({          //step 3 
     $or:[ { username },{ email }]
 })     
    if(existedUser){
@@ -45,6 +49,7 @@ const registerUser=asyncHandler(async(req,res)=>{
  //step 4
  const avatarLocalPath= req.files?.avatar[0]?.path;
  const coverImageLocalPath= req.files?.coverImage[0]?.path;
+ console.log("avatarLocalPath",avatarLocalPath);
 
  if(!avatarLocalPath){ 
     throw new ApiErrror(400, "avatar files is required") 
