@@ -67,8 +67,8 @@ userSchema.pre("save", async function (next) {         //()=>{} callback functio
      next();
 });
 
-userSchema.methods.isPasswordMatch=async function(plainPassword){
-   return await bcrypt.compare(plainPassword,this.password);
+userSchema.methods.isPasswordCorrect=async function(Password){
+   return await bcrypt.compare(Password,this.password);
 }
 
 //jwt is bearing token

@@ -12,6 +12,28 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
 
+
+// generate access and refresh tokens bec we will use this  many times so we creat it in a method
+const generateAccessAndRefreshTokens= async(userId)=>
+{
+    try{
+         const user=await User.findById(userId)
+         const accessToken=user.generateAccessToken()
+         const refreshToken= user.generateRefreshToken()  //db mai bi save karte hai kuki bar bar password na karna pade
+
+         user.refreshToken= refreshToken           //db mai save karna hai
+            await user.save({ validateBeforeSave:false })  //password hash na ho save karte time;
+
+
+            return { accessToken, refreshToken }
+    }
+    catch{
+        throw new ApiErrror (500,"something went wrong while generating  R&A tokens")
+    }
+}
+   
+
+
 const registerUser=asyncHandler(async(req,res)=>{
     //get user detais from frontend
     //validation (correcet fromat ,not empty)
@@ -100,5 +122,109 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 })
 
+const loginUser=asyncHandler(async(req,res)=>{
+    //dats from frontend
+    //usename and password
+    //find user by 
+    //password match
+    // access token and refresh token
+    //send cookie in response
+    
 
-export {registerUser} 
+    const {email, username, password }= req.body;
+    
+    if(!username || !email){
+        throw new ApiErrror (400,"username and email are required");
+    }
+    
+    const user= await User.findOne({    //findone used for single entry jo pehele milega husko swnd kar dega
+        $or:[ { username },{ email }]
+    })
+
+    if(!user){
+        throw new ApiErrror(404,"user not found with this username or email")
+    }  
+    
+    const isPasswordValid= await user.isPasswordCorrect(password);
+
+    if(!isPasswordValid){
+        throw new ApiErrror(401,"invalid password")
+    }
+
+    //generate tokens 
+    const { accessToken, refreshToken }= await generateAccessAndRefreshTokens (user._id);
+
+    //send cookie in response  ()
+    
+    const loggedInUser=await User.findById(user._id).      //loggedinuser ke pass sara fields honge except password and refresh token
+    select("-password -refreshToken");
+
+    const options={
+        httpOnly:true,          //only server can access it
+        secure:true,
+    }
+
+    return res.status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(200,
+            {
+                user: loggedInUser,
+                accessToken,
+                refreshToken
+            },
+            "user logged in successfully"
+        )
+    )
+
+
+
+
+});
+
+const logoutUser=asyncHandler(async(req,res)=>{
+    
+   await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                refreshToken: undefined
+            }
+        },
+
+        {
+            new:true
+        }
+   )
+//cookie clear
+   const options={
+        httpOnly:true,          //only server can access it
+        secure:true,
+    }
+ 
+
+    return res.status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+        new ApiResponse(200,{},"user logged out successfully")
+    )
+
+    
+    
+    
+  
+   
+
+     
+    
+
+
+
+})
+
+
+
+
+export {registerUser , loginUser, logoutUser} 
