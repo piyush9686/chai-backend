@@ -47,7 +47,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 
     const {fullname,email,username,password}=req.body
-    //console.log("email",email);
+    console.log("email",email);
 
     if(
        [fullname,email,username, password].some((field)=>   //some true return krdega
@@ -105,8 +105,8 @@ const registerUser=asyncHandler(async(req,res)=>{
         avatar: avatar.url,
         coverImage: coverImage?.url || "",
         password
-    })
-   const createdUser= await user.findById(user._id)
+    }) 
+   const createdUser= await User.findById(user._id)
     .select("-password -refreshToken ")          //ky ky nahi chaiye  so we remove password and refresh token as per step 7 
 
     if(!createdUser){ //check for user creation step 8
@@ -133,7 +133,7 @@ const loginUser=asyncHandler(async(req,res)=>{
 
     const {email, username, password }= req.body;
     
-    if(!username || !email){
+    if(!(username || email)){
         throw new ApiErrror (400,"username and email are required");
     }
     
@@ -146,7 +146,6 @@ const loginUser=asyncHandler(async(req,res)=>{
     }  
     
     const isPasswordValid= await user.isPasswordCorrect(password);
-
     if(!isPasswordValid){
         throw new ApiErrror(401,"invalid password")
     }
@@ -211,7 +210,7 @@ const logoutUser=asyncHandler(async(req,res)=>{
         new ApiResponse(200,{},"user logged out successfully")
     )
 
-    
+
     
     
   

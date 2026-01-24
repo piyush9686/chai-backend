@@ -61,13 +61,16 @@ const userSchema = new Schema(
 
 )
 //passs encrypp
-userSchema.pre("save", async function (next) {         //()=>{} callback function not use here because of 'this' keyword
-    if(!this.isModified("password")) return next();  //if password is not modified then skip hashing
-     this.password=await bcrypt.hash(this.password,10);  //hash the password before saving
-     next();
+userSchema.pre("save", async function () { 
+    
+        //()=>{} callback function not use here because of 'this' keyword
+    if(!this.isModified("password")) return ;  //if password is not modified then skip hashing
+     this.password=await bcrypt.hash(this.password, 10);
+       //hash the password before saving
 });
 
-userSchema.methods.isPasswordCorrect=async function(Password){
+
+userSchema.methods.isPasswordCorrect=async function(Password){ 
    return await bcrypt.compare(Password,this.password);
 }
 

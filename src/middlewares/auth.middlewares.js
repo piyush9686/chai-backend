@@ -1,6 +1,6 @@
 //verify karega user hai ki nhi
 
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiErrror } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.models.js";
@@ -19,7 +19,7 @@ export const verifyJWT=asyncHandler(async(req, _, next)=>{
  
     const decodedToken= jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
      
-   const user= await User.findById(decodedToken?._Id).select("-password -refreshToken")
+   const user= await User.findById(decodedToken?._id).select("-password -refreshToken")
  
    if(!user){
      //discuss about frontend in next video
