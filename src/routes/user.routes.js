@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser,logoutUser,registerUser } from "../controllers/user.controllers.js";
+import { loginUser,logoutUser,registerUser,refreshAccessToken } from "../controllers/user.controllers.js";
 
 import {upload} from "../middlewares/multer.middleware.js"
 
@@ -19,6 +19,10 @@ router.route("/login").post(loginUser)
 
 //secured   route
 router.route("/logout").post(verifyJWT ,logoutUser)
+
+
+//refresh token ka end point
+router.route("/refresh-token").post(refreshAccessToken)  //handled in auth.middlewares.js
 
 
 

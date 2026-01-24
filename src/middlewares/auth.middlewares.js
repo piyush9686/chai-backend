@@ -23,6 +23,7 @@ export const verifyJWT=asyncHandler(async(req, _, next)=>{
  
    if(!user){
      //discuss about frontend in next video
+     
      throw new ApiErrror(401,"invalid access token, user not found")
    }
    

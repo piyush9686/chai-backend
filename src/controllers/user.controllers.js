@@ -158,6 +158,7 @@ const loginUser=asyncHandler(async(req,res)=>{
     const loggedInUser=await User.findById(user._id).      //loggedinuser ke pass sara fields honge except password and refresh token
     select("-password -refreshToken");
 
+
     const options={
         httpOnly:true,          //only server can access it
         secure:true,
@@ -225,5 +226,57 @@ const logoutUser=asyncHandler(async(req,res)=>{
 
 
 
+ //end point ho jahan pe user token refrsh kar sake
+ const refreshAccessToken=asyncHandler(async(req,res)=>{
+        const incomingRefreshToken= req.cookies.refreshToken || req.body.refreshToken;
 
-export {registerUser , loginUser, logoutUser} 
+        if(!incomingRefreshToken){
+            throw new ApiErrror(401,"unauthenticated request")
+        }
+        //verify refresh token
+     try {
+          const decodedToken= jwt.verify(
+               incomingRefreshToken,
+               process.env.REFRESH_TOKEN_SECRET,
+           )
+   
+           const user= await User.findById(decodedToken?._id)
+   
+           if(!user){
+               throw new ApiErrror(401,"invalid refresh token - user not found")
+           }
+   
+           if(user.refreshToken !== incomingRefreshToken){
+               throw new ApiErrror(401,"refresh token is expired or used")
+           }
+   
+     //pehle cookies mai vejna hai
+     const options={
+           httpOnly:true,          //only server can access it
+           secure:true,
+       }
+       
+        const {accessToken, newrefreshToken} =   await generateAccessAndRefreshTokens(user._id);
+        
+   
+        return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newrefreshToken, options)
+        .json(
+           new ApiResponse(200,
+               {
+                   accessToken,
+                  refreshToken: newrefreshToken
+               },
+               "access token refreshed successfully"
+           )
+       )
+     } catch (error) {
+        throw new ApiErrror(401,error?.message|| "invalid refresh token")
+        
+     }
+ })
+
+
+
+export {registerUser , loginUser, logoutUser,refreshAccessToken} 
