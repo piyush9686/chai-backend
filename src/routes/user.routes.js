@@ -22,8 +22,7 @@ router.route("/logout").post(verifyJWT ,logoutUser)
 
 
 //refresh token ka end point
-router.route("/refresh-token").post(refreshAccessToken)  //handled in auth.middlewares.js
-
+router.route("/refresh-token").post(refreshAccessToken)  
 
 
 
