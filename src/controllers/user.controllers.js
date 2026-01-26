@@ -310,7 +310,7 @@ const updateAccountDetails=asyncHandler(async(req,res)=>{
         throw new ApiErrror(400,"All fields are required")
     }
 
-    User.findByIdAndUpdate(
+   const user=await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -357,9 +357,10 @@ const updateUserAvatar=asyncHandler(async(req,res)=>{
 
 const updateUserCoverImage=asyncHandler(async(req,res)=>{
     const coverImageLocalPath=req.file?.path
+
     if(!coverImageLocalPath) throw new ApiErrror(400,"CI file is missing")
 
-     const coverImage=await uploadOnCloudinary(coverImageLocalPath)   
+    const coverImage=await uploadOnCloudinary(coverImageLocalPath)   
      
      if(!coverImage.url) throw new ApiErrror(400,"error while uploading CI")
 
@@ -385,7 +386,8 @@ const updateUserCoverImage=asyncHandler(async(req,res)=>{
 })
 
 
-export {registerUser , loginUser, logoutUser,refreshAccessToken,
+export {registerUser , loginUser, logoutUser,
+     refreshAccessToken,
     changeCurrentPassword,getCurrentUser,
     updateAccountDetails,updateUserAvatar,
     updateUserCoverImage
