@@ -188,8 +188,8 @@ const logoutUser=asyncHandler(async(req,res)=>{
    await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
-                refreshToken: undefined
+            $unset:{
+                refreshToken: 1
             }
         },
 
@@ -210,17 +210,6 @@ const logoutUser=asyncHandler(async(req,res)=>{
     .json(
         new ApiResponse(200,{},"user logged out successfully")
     )
-
-
-    
-    
-  
-   
-
-     
-    
-
-
 
 })
 
