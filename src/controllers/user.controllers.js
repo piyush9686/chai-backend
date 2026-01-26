@@ -465,10 +465,70 @@ const getUSerChannelProfile= asyncHandler(async(req,res)=>{
 })
 
 
+
+const getWatchHistory=asyncHandler(async(req,res)=>{
+   const user=await User.aggregate([
+
+    {
+        $match:{
+            _id:new mongoose.Types.ObjectId(req.user._id)
+        }
+    },
+
+    {
+        $lookup:{
+            from:"videos",
+            localField:"watchHistory",
+            foreignField:"_id",
+            as:"watchHistory",
+            
+            pipeline:[     //sub pipeline we use fro owner
+                {
+                    $lookup:{
+                        from:"users",
+                        localField:"owner",
+                        foreignField:"_id",
+                        as:"owner",
+                        
+                        pipeline:{
+                            $project:{
+                                fullname:1,
+                                username:1,
+                                avatar:1
+                            }
+                        }
+                    }
+                },
+                {  //owner ka filed mai array aya hai so we use sub pipeli so array ko sudar rehehain
+                   $addFields:{
+                       owner:{
+                           $first:"$owner"       //object miljayega so he can do by using .
+                        }
+                    }
+                }
+
+            ]
+
+        }
+    }
+   ]) 
+
+  
+    return res
+   .status(200)
+   .json(
+      new ApiResponse(200,user[0].watchHistory,"watchhistory fetched successful")
+   )
+
+
+
+})
+
 export {registerUser , loginUser, logoutUser,
      refreshAccessToken,
     changeCurrentPassword,getCurrentUser,
     updateAccountDetails,updateUserAvatar,
     updateUserCoverImage,
-    getUSerChannelProfile
+    getUSerChannelProfile,
+    getWatchHistory
 } 
