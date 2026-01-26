@@ -386,9 +386,89 @@ const updateUserCoverImage=asyncHandler(async(req,res)=>{
 })
 
 
+const getUSerChannelProfile= asyncHandler(async(req,res)=>{
+   const {username} = req.params          //params -  url se milega user 
+
+   if(!username?.trim()) throw new ApiErrror(400,"username is missing")
+
+   //username se document find karte haim   using pip
+   const channel =await User.aggregate([
+    {
+        $match:{
+            username: username?.toLowerCase()
+        }
+    },
+    {
+        $lookup:{  // join data as left outer join         maireko koi subc kiya hai
+            from:"subscriptions",
+            localField:_id,
+            foreignField:"channel",
+            as:"subscribers"
+        }
+
+    },
+    {
+      $lookup:{  //mai jisko subc kiya hun
+            from:"subscriptions",
+            localField:_id,
+            foreignField:"subscriber",
+            as:"subscribedTo"
+        }
+   
+    },
+
+    {//we count 
+        $addFields:{
+            subscrbersCount:{
+                $size:"$subscribers"
+            },
+            channelsSubscribedToCount:{
+                $size:"$subscribedTo"
+            },
+            isSubscribed:{
+                $cond:{
+                    if:{$in:[req.user?._id,$subscribers.subscriber]},
+                    then:true,
+                    else:false
+                }
+            }
+        }
+    },
+
+    {    //jo jo value hamko dikhana hai tu we write 1
+        $project:{ 
+            fullname:1,
+            username:1,
+            subscrbersCount:1,
+            channelsSubscribedToCount:1,
+            isSubscribed:1
+            ,avatar:1,
+            coverImage:1,
+            email:1
+
+            
+
+
+        }
+    }
+   ])  
+
+   if(!channel?.length)
+    throw new ApiErrror(404,"channel does not exit")
+
+
+   return res
+   .status(200)
+   .json(
+      new ApiResponse(200,channel[0],"user channel fetched successfully")
+   )
+})
+
+
 export {registerUser , loginUser, logoutUser,
      refreshAccessToken,
     changeCurrentPassword,getCurrentUser,
     updateAccountDetails,updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUSerChannelProfile
 } 
