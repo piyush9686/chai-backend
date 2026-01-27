@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { loginUser,logoutUser,registerUser,
-    refreshAccessToken, changeCurrentPassword, getCurrentUser,
-     updateAccountDetails, updateUserAvatar, updateUserCoverImage,
+      refreshAccessToken, changeCurrentPassword, getCurrentUser,
+      updateAccountDetails, updateUserAvatar, updateUserCoverImage,
       getUSerChannelProfile, getWatchHistory } 
       from "../controllers/user.controllers.js";
 
@@ -12,7 +12,7 @@ import { verifyJWT } from "../middlewares/auth.middlewares.js";
 const router=Router()
 
 router.route("/register").post(
-    upload.fields([                           //we use middleeare for file upload    juat befoe posmethod
+    upload.fields([                           //we use middleeare for file upload just befoe postmethod
         {name:'avatar',maxCount:1},
         {name:'coverImage',maxCount:1}
     ]),
@@ -21,11 +21,12 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser)  
 
-//secured   route
+//secured route
 router.route("/logout").post(verifyJWT ,logoutUser)
 
 
-//refresh token ka end point
+
+//refresh token ka end point      
 router.route("/refresh-token").post(refreshAccessToken)  
 
 router.route("/change-password").post(verifyJWT,changeCurrentPassword)
@@ -42,8 +43,5 @@ router.route("/cover-Image").patch(verifyJWT,upload.single("coverImage"),updateU
 router.route("/c/:username").get(verifyJWT,getUSerChannelProfile)
 
 router.route("/history").get(verifyJWT,getWatchHistory)
-
-
-
 
 export default router
